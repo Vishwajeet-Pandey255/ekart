@@ -1,25 +1,32 @@
-import React, { createContext, useState, useEffect, useContext} from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 
 const ThemeContext = createContext();
 
 const ThemeProvider = (props) => {
-    const [theme, setTheme] = useState(JSON.parse(localStorage.getItem('theme')) || false );
+    // Set initial state based on localStorage or a default value
+    const savedTheme = localStorage.getItem('theme');
+    // Check if the savedTheme is valid JSON or not
+    const initialTheme = savedTheme ? (savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : 'light') : 'light';
     
-    useEffect(()=>{
-        localStorage.setItem('theme', JSON.stringify(theme));
-    },[theme]);
+    const [theme, setTheme] = useState(initialTheme);
+    
+    useEffect(() => {
+        // Store the theme as a string (no need to JSON.stringify if we're just storing 'dark' or 'light')
+        localStorage.setItem('theme', theme);
+    }, [theme]);
 
-    const setThemeMode = mode => setTheme(mode);
+    const setThemeMode = (mode) => setTheme(mode);
+
     return (
-        <ThemeContext.Provider value={{ theme, setThemeMode}}>
+        <ThemeContext.Provider value={{ theme, setThemeMode }}>
             {props.children}
         </ThemeContext.Provider>
     );
 };
 
-const useThemeHook = () =>{
-    const {theme} = useContext(ThemeContext);
+const useThemeHook = () => {
+    const { theme } = useContext(ThemeContext);
     return [theme];
 }
 
-export { ThemeProvider, ThemeContext, useThemeHook};
+export { ThemeProvider, ThemeContext, useThemeHook };
